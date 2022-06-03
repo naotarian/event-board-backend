@@ -30,4 +30,10 @@ class EventController extends Controller
         $res = ['code' => 200];
         return response()->json($res);
     }
+
+    public function get_events(Request $request) {
+        $events = Event::all();
+        $res = ['status' => 'OK', 'contents' => $events];
+        return response()->json($res);
+    }
 }
