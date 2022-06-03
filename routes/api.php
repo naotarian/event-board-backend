@@ -19,4 +19,5 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/user', function (Request 
 });
 Route::controller(EventController::class)->group(function(){
     Route::post('/create_event', 'create_event');
+    Route::get('/get_events', 'get_events');
 });
