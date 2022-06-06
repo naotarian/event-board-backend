@@ -36,4 +36,17 @@ class EventController extends Controller
         $res = ['status' => 'OK', 'contents' => $events];
         return response()->json($res);
     }
+    public function event_search(Request $request) {
+        $query = Event::query();
+        if($request['keyWord']) {
+            //キーワード検索
+            $keyword = '%' . addcslashes($request['keyWord'], '%_\\') . '%';
+            $query->where('title', 'LIKE', $keyword);
+        } else {
+            $events = Event::all();
+        }
+        $events = $query->get();
+        $res = ['status' => 'OK', 'contents' => $events];
+        return response()->json($res);
+    }
 }
