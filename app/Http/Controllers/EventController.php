@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 //models
 use App\Models\Event;
+use App\Models\Area;
 
 class EventController extends Controller
 {
@@ -32,18 +33,24 @@ class EventController extends Controller
     }
 
     public function get_events(Request $request) {
-        $events = Event::all();
-        $res = ['status' => 'OK', 'contents' => $events];
+        $contents = [];
+        $contents['events'] = Event::all();
+        $contents['areas'] = Area::select(['id', 'area_name'])->orderBy('display_order', 'asc')->get();
+        $res = ['status' => 'OK', 'contents' => $contents];
         return response()->json($res);
     }
     public function event_search(Request $request) {
         $query = Event::query();
+        $address1 = '東京都港区芝公園4丁目2-8';
+        preg_match('/東京都|北海道|(?:京都|大阪)府|.{6,9}県/', $address1, $date_match);
         if($request['keyWord']) {
             //キーワード検索
             $keyword = '%' . addcslashes($request['keyWord'], '%_\\') . '%';
             $query->where('title', 'LIKE', $keyword);
-        } else {
-            $events = Event::all();
+        }
+        if($request['areas']) {
+            //エリア検索
+            $query->whereIn('area_id', $request['areas']);
         }
         $events = $query->get();
         $res = ['status' => 'OK', 'contents' => $events];
