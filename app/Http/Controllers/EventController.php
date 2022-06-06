@@ -12,6 +12,9 @@ class EventController extends Controller
     public function create_event(Request $request) {
         $post_user = json_decode($request->user(), true);
         $new_event = new Event;
+        preg_match('/東京都|北海道|(?:京都|大阪)府|.{6,9}県/', $request['address'], $area);
+        $area_id = Area::select(['id'])->where('area_name', $area[0])->first();
+        \Log::info($area_id);
         $new_event->user_id = $post_user['id'];
         $new_event->title = $request['eventTitle'];
         $new_event->event_date = $request['eventDate'];
@@ -27,6 +30,7 @@ class EventController extends Controller
         $new_event->email = $request['email'];
         $new_event->recommendation = $request['recommendation'];
         $new_event->notes = $request['notes'];
+        $new_event->area_id = $area_id['id'];
         $new_event->save();
         $res = ['code' => 200];
         return response()->json($res);
@@ -41,8 +45,6 @@ class EventController extends Controller
     }
     public function event_search(Request $request) {
         $query = Event::query();
-        $address1 = '東京都港区芝公園4丁目2-8';
-        preg_match('/東京都|北海道|(?:京都|大阪)府|.{6,9}県/', $address1, $date_match);
         if($request['keyWord']) {
             //キーワード検索
             $keyword = '%' . addcslashes($request['keyWord'], '%_\\') . '%';
