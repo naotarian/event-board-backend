@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\UserController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -21,4 +22,7 @@ Route::controller(EventController::class)->group(function(){
     Route::post('/create_event', 'create_event');
     Route::get('/get_events', 'get_events');
     Route::post('/event_search', 'event_search');
+});
+Route::controller(UserController::class)->group(function(){
+    Route::post('/user_info', 'user_info');
 });
