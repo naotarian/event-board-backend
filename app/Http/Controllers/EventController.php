@@ -38,7 +38,7 @@ class EventController extends Controller
 
     public function get_events(Request $request) {
         $contents = [];
-        $contents['events'] = Event::all();
+        $contents['events'] = Event::with('user')->get();
         $contents['areas'] = Area::select(['id', 'area_name'])->orderBy('display_order', 'asc')->get();
         $res = ['status' => 'OK', 'contents' => $contents];
         return response()->json($res);
