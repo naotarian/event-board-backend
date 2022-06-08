@@ -54,8 +54,14 @@ class EventController extends Controller
             //エリア検索
             $query->whereIn('area_id', $request['areas']);
         }
-        $events = $query->get();
+        $events = $query->with('user')->get();
         $res = ['status' => 'OK', 'contents' => $events];
+        return response()->json($res);
+    }
+    public function event_detail(Request $request) {
+        $contents = [];
+        $contents['event_info'] = Event::with('user')->find($request['id']);
+        $res = ['status' => 'OK', 'contents' => $contents];
         return response()->json($res);
     }
 }
