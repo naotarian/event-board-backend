@@ -26,4 +26,5 @@ Route::controller(EventController::class)->group(function(){
 });
 Route::controller(UserController::class)->group(function(){
     Route::post('/user_info', 'user_info');
+    Route::get('/my_page', 'my_page');
 });
