@@ -14,7 +14,6 @@ class EventController extends Controller
         $new_event = new Event;
         preg_match('/東京都|北海道|(?:京都|大阪)府|.{6,9}県/', $request['address'], $area);
         $area_id = Area::select(['id'])->where('area_name', $area[0])->first();
-        \Log::info($area_id);
         $new_event->user_id = $post_user['id'];
         $new_event->title = $request['eventTitle'];
         $new_event->event_date = $request['eventDate'];
@@ -29,6 +28,7 @@ class EventController extends Controller
         $new_event->theme = $request['eventTheme'];
         $new_event->email = $request['email'];
         $new_event->recommendation = $request['recommendation'];
+        $new_event->number_of_applicants = $request['numberOfApplicants'];
         $new_event->notes = $request['notes'];
         $new_event->area_id = $area_id['id'];
         $new_event->save();
