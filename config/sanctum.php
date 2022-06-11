@@ -17,7 +17,7 @@ return [
         [parse_url(env('FRONTEND_URL'), PHP_URL_HOST)],
         explode(',', env(
             'SANCTUM_STATEFUL_DOMAINS',
-            'localhost,localhost:3000,127.0.0.1,127.0.0.1:8000,::1,3.129.189.49:3000'
+            'localhost,localhost:3000,localhost:8080,127.0.0.1,127.0.0.1:8000,::1,3.129.189.49:3000'
         )),
     ),
 

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,5 +15,4 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::redirect('/', config('app.frontend_url'));
-
 require __DIR__.'/auth.php';
