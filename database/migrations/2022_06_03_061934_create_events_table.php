@@ -35,6 +35,7 @@ return new class extends Migration
             $table->text('recommendation')->nullable()->comment('こんな方におすすめ');
             $table->text('notes')->nullable()->comment('注意事項');
             $table->timestamps();
+            $table->softDeletes();
             $table->foreign('user_id')
             ->references('id')->on('users')
             ->onDelete('cascade');

@@ -64,4 +64,10 @@ class EventController extends Controller
         $res = ['status' => 'OK', 'contents' => $contents];
         return response()->json($res);
     }
+    public function event_tags_search(Request $request) {
+        // $events = Event::with('user')->whereJsonContains('event_tags', [1])->orWhereJsonContains('event_tags', [4])->get();
+        $events = Event::with('user')->whereJsonContains('event_tags', [$request['id']])->get();
+        $res = ['status' => 'OK', 'contents' => $events];
+        return response()->json($res);
+    }
 }

@@ -24,6 +24,7 @@ Route::controller(EventController::class)->group(function(){
     Route::get('/get_events', 'get_events');
     Route::post('/event_search', 'event_search');
     Route::post('/event_detail', 'event_detail');
+    Route::post('/event_tags_search', 'event_tags_search');
 });
 Route::controller(UserController::class)->group(function(){
     Route::post('/user_info', 'user_info');
