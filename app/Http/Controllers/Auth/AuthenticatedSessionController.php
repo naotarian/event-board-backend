@@ -18,6 +18,9 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request)
     {
+        $aes_key = config('app.aes_key');
+        $aes_type = config('app.aes_type');
+        $request['email'] = openssl_encrypt($request['email'], $aes_type, $aes_key);
         $request->authenticate();
 
         $request->session()->regenerate();

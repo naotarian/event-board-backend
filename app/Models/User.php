@@ -52,6 +52,31 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         $this->notify(new VerifyEmail);
     }
+    /**
+     * データの取得周り
+     */
+    // Public function getUserAttribute($value){
+    //     $aes_key = config('app.aes_key');
+    //     $aes_type = config('app.aes_type');
+    //     return empty($value) ? null : openssl_decrypt($value, $aes_type, $aes_key);
+    //     // return Crypt::decrypt($value);
+    // }
+
+    // /**
+    //  * データの保存周り
+    //  */
+    // Public function setUserAttribute($value){
+    //     $aes_key = config('app.aes_key');
+    //     $aes_type = config('app.aes_type');
+    //     $this->attributes['name'] = empty($value) ? null : openssl_encrypt($value, $aes_type, $aes_key);
+    //     $this->attributes['email'] = empty($value) ? null : openssl_encrypt($value, $aes_type, $aes_key);
+    //     // $this->attributes['name'] = Crypt::encrypt($value);
+    // }
+    // public function setEmailAttribute($value)
+    // {
+
+    //     $this->attributes['email'] = openssl_encrypt($value, $aes_type, $aes_key);
+    // }
 
     /**
      * override
