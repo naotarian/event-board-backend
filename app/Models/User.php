@@ -10,9 +10,12 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Notifications\VerifyEmail;
 use App\Notifications\ResetPassword;
 use App\Models\Event;
+use Illuminate\Database\Eloquent\SoftDeletes;
 class User extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory, Notifiable, HasApiTokens;
+    use softDeletes;
+    
 
     /**
      * The attributes that are mass assignable.
