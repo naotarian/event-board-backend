@@ -42,6 +42,7 @@ class EventController extends Controller
         $contents['events'] = Event::with('user')->get()->toArray();
         $contents['events'] = $this->__event_tags($contents['events']);
         $contents['areas'] = Area::select(['id', 'area_name'])->orderBy('display_order', 'asc')->get();
+        $contents['tags'] = Tag::limit(10)->get();
         $res = ['status' => 'OK', 'contents' => $contents];
         return response()->json($res);
     }
