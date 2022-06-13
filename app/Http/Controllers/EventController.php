@@ -40,20 +40,9 @@ class EventController extends Controller
     public function get_events(Request $request) {
         $contents = [];
         $contents['events'] = Event::with('user')->get()->toArray();
-        foreach($contents['events'] as &$event) {
-            $event['id_tagname'] = [];
-            if($event['event_tags']) {
-                foreach($event['event_tags'] as $tag){
-                    $select_tag = Tag::find($tag);
-                    $id = $select_tag['id'];
-                    $tag_name = $select_tag['tag_name'];
-                    \Log::info($select_tag['id']);
-                    \Log::info($select_tag['tag_name']);
-                    $event['id_tagname'][$id] = $tag_name;
-                }
-            }
-        }
+        $contents['events'] = $this->__event_tags($contents['events']);
         $contents['areas'] = Area::select(['id', 'area_name'])->orderBy('display_order', 'asc')->get();
+        $contents['tags'] = Tag::limit(10)->get();
         $res = ['status' => 'OK', 'contents' => $contents];
         return response()->json($res);
     }
@@ -78,10 +67,25 @@ class EventController extends Controller
         $res = ['status' => 'OK', 'contents' => $contents];
         return response()->json($res);
     }
-    public function event_tags_search(Request $request) {
-        // $events = Event::with('user')->whereJsonContains('event_tags', [1])->orWhereJsonContains('event_tags', [4])->get();
-        $events = Event::with('user')->whereJsonContains('event_tags', [$request['id']])->get();
+    public function event_tag_search(Request $request) {
+        $events = Event::with('user')->whereJsonContains('event_tags', [intval($request['tagId'])])->get()->toArray();
+        $events = $this->__event_tags($events);
         $res = ['status' => 'OK', 'contents' => $events];
         return response()->json($res);
+    }
+
+    public function __event_tags($events) {
+        foreach($events as &$event) {
+            $event['id_tagname'] = [];
+            if($event['event_tags']) {
+                foreach($event['event_tags'] as $tag){
+                    $select_tag = Tag::find($tag);
+                    $id = $select_tag['id'];
+                    $tag_name = $select_tag['tag_name'];
+                    $event['id_tagname'][$id] = $tag_name;
+                }
+            }
+        }
+        return $events;
     }
 }
