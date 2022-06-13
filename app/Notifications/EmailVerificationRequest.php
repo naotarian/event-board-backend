@@ -20,9 +20,8 @@ class EmailVerificationRequest extends FormRequest
         }
         $aes_key = config('app.aes_key');
         $aes_type = config('app.aes_type');
-        // dd($this->route('hash'), sha1(openssl_decrypt($this->user()->getEmailForVerification(), $aes_type, $aes_key)), sha1('test01@test.com'));
         if (! hash_equals((string) $this->route('hash'),
-            sha1(openssl_decrypt($this->user()->getEmailForVerification(), $aes_type, $aes_key)))) {
+            sha1($this->user()->getEmailForVerification()))) {
             return false;
         }
 
