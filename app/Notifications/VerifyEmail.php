@@ -44,10 +44,16 @@ class VerifyEmail extends Notification
      */
     public function toMail($notifiable)
     {
-        $verificationUrl = $this->verificationUrl($notifiable);
+        $aes_key = config('app.aes_key');
+        $aes_type = config('app.aes_type');
+        $docode_notifiable = json_decode($notifiable, true);
+        $docode_notifiable['email'] = $docode_notifiable['email'];
+        $docode_notifiable['name'] = $docode_notifiable['name'];
+        $docode_notifiable = json_encode($docode_notifiable);
+        $verificationUrl = $this->verificationUrl($docode_notifiable);
 
         if (static::$toMailCallback) {
-            return call_user_func(static::$toMailCallback, $notifiable, $verificationUrl);
+            return call_user_func(static::$toMailCallback, $docode_notifiable, $verificationUrl);
         }
         return $this->buildMailMessage($verificationUrl);
     }
@@ -75,6 +81,7 @@ class VerifyEmail extends Notification
      */
     protected function verificationUrl($notifiable)
     {
+        $decode_notifiable = json_decode($notifiable, true);
         if (static::$createUrlCallback) {
             return call_user_func(static::$createUrlCallback, $notifiable);
         }
@@ -83,8 +90,10 @@ class VerifyEmail extends Notification
             'verification.verify',
             Carbon::now()->addMinutes(Config::get('auth.verification.expire', 60)),
             [
-                'id' => $notifiable->getKey(),
-                'hash' => sha1($notifiable->getEmailForVerification()),
+                'id' => $decode_notifiable['id'],
+                // 'id' => $notifiable->getKey(),
+                'hash' => sha1($decode_notifiable['email']),
+                // 'hash' => sha1($notifiable->getEmailForVerification()),
             ]
         );
     }
