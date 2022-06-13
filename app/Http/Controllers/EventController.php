@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 //models
 use App\Models\Event;
 use App\Models\Area;
+use App\Models\Tag;
 
 class EventController extends Controller
 {
@@ -38,7 +39,20 @@ class EventController extends Controller
 
     public function get_events(Request $request) {
         $contents = [];
-        $contents['events'] = Event::with('user')->get();
+        $contents['events'] = Event::with('user')->get()->toArray();
+        foreach($contents['events'] as &$event) {
+            $event['id_tagname'] = [];
+            if($event['event_tags']) {
+                foreach($event['event_tags'] as $tag){
+                    $select_tag = Tag::find($tag);
+                    $id = $select_tag['id'];
+                    $tag_name = $select_tag['tag_name'];
+                    \Log::info($select_tag['id']);
+                    \Log::info($select_tag['tag_name']);
+                    $event['id_tagname'][$id] = $tag_name;
+                }
+            }
+        }
         $contents['areas'] = Area::select(['id', 'area_name'])->orderBy('display_order', 'asc')->get();
         $res = ['status' => 'OK', 'contents' => $contents];
         return response()->json($res);
