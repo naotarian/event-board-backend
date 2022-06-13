@@ -38,6 +38,7 @@ class RegisteredUserController extends Controller
         $docode_user['email'] = openssl_decrypt($docode_user['email'], $aes_type, $aes_key);
         $docode_user['name'] = openssl_decrypt($docode_user['name'], $aes_type, $aes_key);
         $docode_user = json_encode($docode_user);
+        
         event(new Registered($docode_user));
 
         return response()->noContent();
