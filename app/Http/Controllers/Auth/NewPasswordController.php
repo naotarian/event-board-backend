@@ -22,12 +22,14 @@ class NewPasswordController extends Controller
      */
     public function store(Request $request)
     {
+        $aes_key = config('app.aes_key');
+        $aes_type = config('app.aes_type');
         $request->validate([
             'token' => 'required',
             'email' => 'required|email',
             'password' => 'required|string|confirmed|min:8',
         ]);
-
+        $request['email'] = openssl_encrypt($request['email'], $aes_type, $aes_key);
         // Here we will attempt to reset the user's password. If it is successful we
         // will update the password on an actual user model and persist it to the
         // database. Otherwise we will parse the error and return the response.
@@ -38,7 +40,6 @@ class NewPasswordController extends Controller
                     'password' => Hash::make($request->password),
                     'remember_token' => Str::random(60),
                 ])->save();
-
                 event(new PasswordReset($user));
             }
         );
