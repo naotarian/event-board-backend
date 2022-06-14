@@ -26,7 +26,6 @@ Route::post('/reset-password', [NewPasswordController::class, 'store'])
 
 Route::get('/verify-email/{id}/{hash}', [VerifyEmailController::class, '__invoke'])
                 ->middleware(['auth', 'throttle:6,1'])
-                // ->middleware(['auth', 'signed', 'throttle:6,1'])
                 ->name('verification.verify');
 Route::post('/email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
                 ->middleware(['auth', 'throttle:6,1'])
@@ -38,3 +37,7 @@ Route::post('/confirm-password', [ConfirmablePasswordController::class, 'store']
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
                 ->middleware('auth')
                 ->name('logout');
+
+Route::get('/reset-password/{token}', function ($token) {
+  return redirect()->intended(config('app.frontend_url').'/reset-password/'.$token);
+})->middleware('guest')->name('password.reset');
