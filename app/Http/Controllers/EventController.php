@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 //models
 use App\Models\Event;
 use App\Models\Area;
+use App\Models\TagCategory;
 use App\Models\Tag;
 
 class EventController extends Controller
@@ -32,6 +33,13 @@ class EventController extends Controller
         $new_event->number_of_applicants = $request['numberOfApplicants'];
         $new_event->notes = $request['notes'];
         $new_event->area_id = $area_id['id'];
+        $tag_int = [];
+        if($request['event_tags']) {
+            foreach($request['event_tags'] as $tag) {
+                array_push($tag_int, intval($tag));
+            }
+        }
+        $new_event->event_tags = $tag_int;
         $new_event->save();
         $res = ['code' => 200];
         return response()->json($res);
@@ -87,5 +95,12 @@ class EventController extends Controller
             }
         }
         return $events;
+    }
+
+    public function get_tags() {
+        $contents = [];
+        $contents['tags'] = TagCategory::with('tags')->get();
+        $res = ['status' => 'OK', 'contents' => $contents];
+        return response()->json($res);
     }
 }
