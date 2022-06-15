@@ -45,7 +45,7 @@ class EventController extends Controller
         return response()->json($res);
     }
 
-    public function get_events(Request $request) {
+    public function get_events() {
         $contents = [];
         $contents['events'] = Event::with('user')->get()->toArray();
         $contents['events'] = $this->__event_tags($contents['events']);
