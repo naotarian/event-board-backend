@@ -3,12 +3,12 @@ name: event-board-backend
 on:
   push:
     branches: 
-    - main
+#     - main
     - feature/**
   pull_request:
     branches:
     - develop
-    - main
+#     - main
 
 jobs:
   laravel-tests:
