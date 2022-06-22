@@ -21,11 +21,13 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/user', function (Request 
 });
 Route::controller(EventController::class)->group(function(){
     Route::post('/create_event', 'create_event');
-    Route::get('/get_events', 'get_events')->middleware('auth:sanctum');
+    Route::get('/get_events', 'get_events');
     Route::post('/event_search', 'event_search');
     Route::post('/event_detail', 'event_detail');
     Route::post('/event_tag_search', 'event_tag_search');
     Route::get('/get_tags', 'get_tags');
+    Route::post('/event_application', 'event_application');
+
 });
 Route::controller(UserController::class)->group(function(){
     Route::post('/user_info', 'user_info');
