@@ -10,9 +10,15 @@ use App\Models\TagCategory;
 use App\Models\Tag;
 use App\Models\ApplicationManagement;
 use App\Models\EventCrowdManagement;
+//Libraries
+use Carbon\Carbon;
 
 class EventController extends Controller
 {
+    public function __construct() {
+        $this->aes_key = config('app.aes_key');
+        $this->aes_type = config('app.aes_type');
+    }
     public function create_event(Request $request) {
         $post_user = json_decode($request->user(), true);
         $new_event = new Event;
@@ -114,7 +120,18 @@ class EventController extends Controller
 
     //申込処理
     public function event_application(Request $request) {
-        \Log::info($request);
+        $application = new ApplicationManagement;
+        $application->application_date = Carbon::now();
+        if($request['guestFlag']) {
+            //未ログイン(ゲスト)
+            $application->event_id = $request['eventId'];
+            $application->user_id = 0;
+            $application->user_name = openssl_encrypt($request['userName'], $this->aes_type, $this->aes_key);
+            $application->email = openssl_encrypt($request['email'], $this->aes_type, $this->aes_key);
+            $application->save();
+            $application->application_number = hash('crc32', $application->id);
+            $application->save();
+        }
         $res = ['status' => 'OK'];
         return response()->json($res);
     }
