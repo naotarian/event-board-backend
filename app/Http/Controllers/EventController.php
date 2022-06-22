@@ -8,6 +8,8 @@ use App\Models\Event;
 use App\Models\Area;
 use App\Models\TagCategory;
 use App\Models\Tag;
+use App\Models\ApplicationManagement;
+use App\Models\EventCrowdManagement;
 
 class EventController extends Controller
 {
@@ -41,6 +43,11 @@ class EventController extends Controller
         }
         $new_event->event_tags = $tag_int;
         $new_event->save();
+        //人数管理テーブル作成
+        $crowd = new EventCrowdManagement;
+        $crowd->event_id = $new_event->id;
+        $crowd->number_of_applicants = $new_event->number_of_applicants;
+        $crowd->save();
         $res = ['code' => 200];
         return response()->json($res);
     }
