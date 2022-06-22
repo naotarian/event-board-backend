@@ -78,7 +78,7 @@ class EventController extends Controller
     }
     public function event_detail(Request $request) {
         $contents = [];
-        $contents['event_info'] = Event::with('user')->find($request['id']);
+        $contents['event_info'] = Event::with('user')->with('event_crowd_management')->find($request['id']);
         $contents['event_info']['set_tags'] = Tag::whereIn('id', $contents['event_info']['event_tags'])->get();
         $res = ['status' => 'OK', 'contents' => $contents];
         return response()->json($res);
@@ -109,6 +109,13 @@ class EventController extends Controller
         $contents = [];
         $contents['tags'] = TagCategory::with('tags')->get();
         $res = ['status' => 'OK', 'contents' => $contents];
+        return response()->json($res);
+    }
+
+    //申込処理
+    public function event_application(Request $request) {
+        \Log::info($request);
+        $res = ['status' => 'OK'];
         return response()->json($res);
     }
 }
