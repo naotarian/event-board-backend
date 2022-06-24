@@ -12,6 +12,9 @@ use App\Models\ApplicationManagement;
 use App\Models\EventCrowdManagement;
 //Libraries
 use Carbon\Carbon;
+//Mail
+use Mail;
+use App\Mail\ComplateApplication;
 
 class EventController extends Controller
 {
@@ -140,6 +143,12 @@ class EventController extends Controller
         }
         $application->application_number = hash('crc32', $application->id);
         $application->save();
+        if($request['guestFlag']) {
+            Mail::to($request['email'])->send(new ComplateApplication(false));
+        } else {
+            Mail::to($auth_user['email'])->send(new ComplateApplication(false));
+        }
+        Mail::to($request['email'])->send(new ComplateApplication(true));
         $res = ['status' => 'OK'];
         return response()->json($res);
     }
