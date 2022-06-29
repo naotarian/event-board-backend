@@ -18,4 +18,10 @@ class ApplicationManagement extends Model
         'created_at',
         'updated_at',
     ];
+    public function user() {
+        return $this->belongsTo('App\Models\User');
+    }
+    public function event() {
+        return $this->belongsTo('App\Models\Event', 'user_id');
+    }
 }

@@ -86,8 +86,23 @@ class EventController extends Controller
         return response()->json($res);
     }
     public function event_detail(Request $request) {
+        $auth_user = json_decode($request->user(), true);
         $contents = [];
         $contents['event_info'] = Event::with('user')->with('event_crowd_management')->find($request['id']);
+        if($auth_user) {
+            $already = ApplicationManagement::where('user_id', $auth_user['id'])->get();
+            $already_list = [];
+            if($already) {
+                foreach($already as $data) {
+                    array_push($already_list, $data['event_id']);
+                }
+                $contents['event_info']['already_applications'] = $already_list;
+            } else {
+                $contents['event_info']['already_applications'] = null;
+            }
+        } else {
+            $contents['event_info']['already_applications'] = null;
+        }
         $contents['event_info']['set_tags'] = Tag::whereIn('id', $contents['event_info']['event_tags'])->get();
         $res = ['status' => 'OK', 'contents' => $contents];
         return response()->json($res);
@@ -136,6 +151,7 @@ class EventController extends Controller
         } else {
             //ログインユーザー
             $auth_user = json_decode($request->user(), true);
+            $request['email'] = $auth_user['email'];
             $application->user_id = $auth_user['id'];
             $application->user_name = openssl_encrypt($auth_user['name'], $this->aes_type, $this->aes_key);
             $application->email = openssl_encrypt($auth_user['email'], $this->aes_type, $this->aes_key);
@@ -143,12 +159,9 @@ class EventController extends Controller
         }
         $application->application_number = hash('crc32', $application->id);
         $application->save();
-        if($request['guestFlag']) {
-            Mail::to($request['email'])->send(new ComplateApplication(false));
-        } else {
-            Mail::to($auth_user['email'])->send(new ComplateApplication(false));
-        }
-        Mail::to($request['email'])->send(new ComplateApplication(true));
+        Mail::to($request['email'])->send(new ComplateApplication(false));
+        $own_mail = Event::select('email')->where('id', $request['eventId'])->first();
+        Mail::to($own_mail['email'])->send(new ComplateApplication(true));
         $res = ['status' => 'OK'];
         return response()->json($res);
     }

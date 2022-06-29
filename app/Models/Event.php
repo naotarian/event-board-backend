@@ -21,6 +21,10 @@ class Event extends Model
     public function event_crowd_management() {
         return $this->hasOne('App\Models\EventCrowdManagement');
     }
+    public function ApplicationManagements()
+    {
+        return $this->hasMany('App\Models\ApplicationManagement', 'user_id');
+    }
     protected static function newFactory() {
         return EventFactory::new();
     }
