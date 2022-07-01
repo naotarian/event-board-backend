@@ -15,6 +15,7 @@ use Carbon\Carbon;
 //Mail
 use Mail;
 use App\Mail\ComplateApplication;
+use App\Mail\AlreadyApplication;
 
 class EventController extends Controller
 {
@@ -143,10 +144,18 @@ class EventController extends Controller
         $application->event_id = $request['eventId'];
         if($request['guestFlag']) {
             //未ログイン(ゲスト)
-            $application->user_id = 0;
-            $application->user_name = openssl_encrypt($request['userName'], $this->aes_type, $this->aes_key);
-            $application->email = openssl_encrypt($request['email'], $this->aes_type, $this->aes_key);
-            $application->save();
+            $is_already = ApplicationManagement::where('event_id', $request['eventId'])
+                                                    ->where('email', openssl_encrypt($request['email'], $this->aes_type, $this->aes_key))
+                                                    ->count() == 0 ? false : true;
+            \Log::info($is_already);
+            if($is_already) {
+                $msg = 'すでに申込済みのメールアドレスです。';
+            } else {
+                $application->user_id = 0;
+                $application->user_name = openssl_encrypt($request['userName'], $this->aes_type, $this->aes_key);
+                $application->email = openssl_encrypt($request['email'], $this->aes_type, $this->aes_key);
+                $application->save();
+            }
             
         } else {
             //ログインユーザー
@@ -157,12 +166,17 @@ class EventController extends Controller
             $application->email = openssl_encrypt($auth_user['email'], $this->aes_type, $this->aes_key);
             $application->save();
         }
-        $application->application_number = hash('crc32', $application->id);
-        $application->save();
-        Mail::to($request['email'])->send(new ComplateApplication(false));
-        $own_mail = Event::select('email')->where('id', $request['eventId'])->first();
-        Mail::to($own_mail['email'])->send(new ComplateApplication(true));
-        $res = ['status' => 'OK'];
+        if(!$is_already) {
+            $application->application_number = hash('crc32', $application->id);
+            $application->save();
+            Mail::to($request['email'])->send(new ComplateApplication(false));
+            $own_mail = Event::select('email')->where('id', $request['eventId'])->first();
+            Mail::to($own_mail['email'])->send(new ComplateApplication(true));
+            $msg = '申し込みが完了しました。';
+        } else {
+            Mail::to($request['email'])->send(new AlreadyApplication());
+        }
+        $res = ['status' => 'OK', 'msg' => $msg];
         return response()->json($res);
     }
 }
