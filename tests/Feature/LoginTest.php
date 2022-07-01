@@ -23,7 +23,7 @@ class LoginTest extends TestCase
        // テストユーザ作成
        $this->user = User::factory()->create();
    }
-    public function test_example()
+    public function test_正しいパスワードの場合()
     {
         //ユーザー作成
         // $user = User::factory()->create();
@@ -36,5 +36,19 @@ class LoginTest extends TestCase
         ]);
         //認証されていることを確認
         $this->assertTrue(Auth::check());
+    }
+    public function test_間違ったパスワードの場合()
+    {
+        //ユーザー作成
+        // $user = User::factory()->create();
+        //認証されていないことを確認
+        $this->assertFalse(Auth::check());
+        //ログイン実行
+        $response = $this->post('login', [
+            'email'    => $this->user->email,
+            'password' => 'pass'
+        ]);
+        //認証されないことを確認
+        $this->assertFalse(Auth::check());
     }
 }
