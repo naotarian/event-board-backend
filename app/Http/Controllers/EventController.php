@@ -87,7 +87,6 @@ class EventController extends Controller
         return response()->json($res);
     }
     public function event_detail(Request $request) {
-        \Log::info($request);
         $auth_user = json_decode($request->user(), true);
         $contents = [];
         $contents['event_info'] = Event::with('user')->with('event_crowd_management')->find($request['id']);
