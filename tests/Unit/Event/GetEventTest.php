@@ -13,7 +13,7 @@ use App\Models\Event;
 class GetEventTest extends TestCase
 {
     use RefreshDatabase;
-    use DatabaseTransactions;
+    // use DatabaseTransactions;
     private $accessToken = null;
 
     protected function setUp(): Void
@@ -32,11 +32,8 @@ class GetEventTest extends TestCase
      */
     public function test_get_events()
     {
-        // $event = Event::factory()->create();
-        // \Log::info(json_decode($event, true));
         $response = $this->get('/api/get_events');
         $response->dump();
         $response->assertStatus(200);
-        // $this->assertTrue(true);
     }
 }
