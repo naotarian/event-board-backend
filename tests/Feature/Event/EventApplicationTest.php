@@ -11,15 +11,15 @@ use Database\Seeders\AreasSeeder;
 use Database\Seeders\TagCategoriesSeeder;
 use Database\Seeders\TagsSeeder;
 use Carbon\Carbon;
-
-class EventDetailTest extends TestCase
+use Illuminate\Support\Facades\Auth;
+class EventApplicationTest extends TestCase
 {
     /**
      * A basic feature test example.
      *
      * @return void
      */
-        protected function setUp(): Void
+    protected function setUp(): Void
     {
         // 必ずparent::setUp()を呼び出す
         parent::setUp(); 
@@ -27,12 +27,14 @@ class EventDetailTest extends TestCase
         $this->seed(TagCategoriesSeeder::class);
         $this->seed(TagsSeeder::class);
         $this->user = User::factory()->create();
-        $response = $this->post('login', [
+        $this->user2 = User::factory()->create();
+        $login = $this->post('login', [
             'email'    => $this->user->email,
             'password' => 'password'
         ]);
+        $this->assertTrue(Auth::check());
         $date = Carbon::now();
-        for($i = 1; $i < 10; $i++) {
+        for($i = 1; $i < 4; $i++) {
             $test = $this->post('/api/create_event' ,[
                 'eventTitle' => 'testタイトル' . $i,
                 'eventDate' => $date->format('Y/m/d'),
@@ -56,16 +58,31 @@ class EventDetailTest extends TestCase
                 ),
             ]);
         }
+        $logout = $this->post('logout');
+        $this->assertFalse(Auth::check());
     }
-    public function test_イベント詳細取得()
+    public function test_ゲスト申し込み()
     {
-        for($i = 1; $i < 3; $i++) {
-            $response = $this->post('/api/event_detail', [
-                'id' => $i,
-                'isAuth' => 0
-            ]);
-            // $response->dump();
-            $response->assertStatus(200);
-        }
+        $response = $this->post('/api/event_application', [
+            'userId' => -1,
+            'eventId' => 3,
+            'userName' => 'test',
+            'email' => 'test@test.com',
+            'guestFlag' => true,
+        ]);
+
+        $response->assertStatus(200);
+    }
+    public function test_認証済みユーザー申し込み() {
+        $login = $this->post('login', [
+            'email'    => $this->user2->email,
+            'password' => 'password'
+        ]);
+        $this->assertTrue(Auth::check());
+        $response = $this->post('/api/event_application', [
+            'eventId' => 1,
+            'guestFlag' => false,
+        ]);
+        $response->assertStatus(200);
     }
 }
