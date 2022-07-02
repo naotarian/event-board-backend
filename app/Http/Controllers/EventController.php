@@ -142,12 +142,12 @@ class EventController extends Controller
         $application = new ApplicationManagement;
         $application->application_date = Carbon::now();
         $application->event_id = $request['eventId'];
+        $is_already = 0;
         if($request['guestFlag']) {
             //未ログイン(ゲスト)
             $is_already = ApplicationManagement::where('event_id', $request['eventId'])
                                                     ->where('email', openssl_encrypt($request['email'], $this->aes_type, $this->aes_key))
                                                     ->count() == 0 ? false : true;
-            \Log::info($is_already);
             if($is_already) {
                 $msg = 'すでに申込済みのメールアドレスです。';
             } else {

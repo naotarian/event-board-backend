@@ -64,7 +64,7 @@ class GetEventTest extends TestCase
     public function test_イベント取得()
     {
         $response = $this->get('/api/get_events');
-        $response->dump();
+        // $response->dump();
         $response->assertStatus(200);
     }
 }
