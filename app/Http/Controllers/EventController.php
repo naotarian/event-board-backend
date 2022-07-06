@@ -179,4 +179,10 @@ class EventController extends Controller
         $res = ['status' => 'OK', 'msg' => $msg];
         return response()->json($res);
     }
+
+    public function event_contact(Request $request) {
+        \Log::info($request);
+        $res = ['status' => 'OK'];
+        return response()->json($res);
+    }
 }
