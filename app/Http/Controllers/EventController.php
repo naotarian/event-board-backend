@@ -10,12 +10,14 @@ use App\Models\TagCategory;
 use App\Models\Tag;
 use App\Models\ApplicationManagement;
 use App\Models\EventCrowdManagement;
+use App\Models\EventContact;
 //Libraries
 use Carbon\Carbon;
 //Mail
 use Mail;
 use App\Mail\ComplateApplication;
 use App\Mail\AlreadyApplication;
+use App\Mail\EventContactMail;
 
 class EventController extends Controller
 {
@@ -181,7 +183,22 @@ class EventController extends Controller
     }
 
     public function event_contact(Request $request) {
-        \Log::info($request);
+        $authenticate = $request->user();
+        $contact_ins = new EventContact;
+        $ins_datas = [];
+        $ins_datas['user_id'] = $authenticate ? $authenticate->id : 0;
+        $ins_datas['user_name'] = $authenticate ? $authenticate->name : 'guest';
+        $ins_datas['email'] = $request['email'];
+        $ins_datas['event_id'] = $request['eventId'];
+        $ins_datas['contents'] = $request['contactText'];
+        $ins_datas['contact_date'] = Carbon::now();
+        $contact_ins->fill($ins_datas);
+        $contact_ins->save();
+        $contact_ins['contact_number'] = hash('crc32', $contact_ins->id);
+        $contact_ins->save();
+        Mail::to($request['email'])->send(new EventContactMail(false));
+        $event_email = Event::select('email')->where('id', $request['eventId'])->first();
+        Mail::to($event_email['email'])->send(new EventContactMail(true));
         $res = ['status' => 'OK'];
         return response()->json($res);
     }
